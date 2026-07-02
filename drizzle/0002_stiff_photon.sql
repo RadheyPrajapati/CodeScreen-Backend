@@ -1,0 +1,1 @@
+ALTER TABLE "interview" ADD COLUMN "meeting_name" text NOT NULL;
