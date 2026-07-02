@@ -13,6 +13,7 @@ type userType = {
 }
 
 export const createUser = async (data:userType) => {
+    console.log("register !!!", data);
     const { email, password, name, role } = data;
     const hashedPassword = await bcrypt.hash(password, 3);
     return await db.insert(user).values({ email, password: hashedPassword, name, role}).returning();
