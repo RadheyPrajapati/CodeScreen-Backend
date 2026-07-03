@@ -10,6 +10,8 @@ type resumeType = {
 } | null;
 
 export const uploadPdf = async (pdfBuffer: any, userId: number): Promise<resumeType> => {
+
+    console.log("pdf upload got!!");
     
     const { data, error } = await supabase.storage
     .from("resumes")
