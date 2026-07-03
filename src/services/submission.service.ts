@@ -70,7 +70,7 @@ export const submitSolution = async (
     interviewId: number
 ) => {
     console.log("QUE_ID", queId);
-    console.log("language:" language);
+    console.log("language:", language);
     const { testCases } = (await getTestcases(queId)) as {
         testCases: TestCase[];
     };
