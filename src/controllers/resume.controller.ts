@@ -3,6 +3,7 @@ import {uploadPdf as uplaodPdfService, getPdfUrl as getPdfUrlService, deletePdf 
 
 export const uplaodPdf = async (req:Request, res:Response) => {
     try{
+        console.log("AT controller! pdf upload req arised !");
         const pdfBuffer = req.file?.buffer;
 
         if(!pdfBuffer) {
