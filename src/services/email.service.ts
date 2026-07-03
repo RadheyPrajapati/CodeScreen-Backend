@@ -19,9 +19,12 @@
 //   console.log("\nEmail Sended! to : ", to);
   
 // };
-
+import dns from "node:dns";
 import nodemailer from "nodemailer";
 import "dotenv/config";
+
+// Force Node.js to prefer IPv4 over IPv6
+dns.setDefaultResultOrder("ipv4first");
 
 type SendEmailParams = {
   to: string;
@@ -30,21 +33,23 @@ type SendEmailParams = {
   text?: string;
 };
 
-// Validate environment variables
-if (!process.env.EMAIL_ID || !process.env.EMAIL_PASSWORD) {
-  throw new Error(
-    "EMAIL_ID or EMAIL_PASSWORD is missing. Please check your environment variables."
-  );
-}
-
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // true for port 465
+  port: 587,
+  secure: false, // STARTTLS
+  family: 4, // Force IPv4
   auth: {
     user: process.env.EMAIL_ID,
     pass: process.env.EMAIL_PASSWORD,
   },
+  tls: {
+    rejectUnauthorized: true,
+  },
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 15000,
+  logger: true,
+  debug: true,
 });
 
 export const sendEmail = async ({
@@ -56,12 +61,9 @@ export const sendEmail = async ({
   try {
     console.log("=================================");
     console.log("Preparing to send email...");
+    console.log("Node Version:", process.version);
     console.log("To:", to);
     console.log("From:", process.env.EMAIL_ID);
-
-    // Verify SMTP connection
-    await transporter.verify();
-    console.log("SMTP connection verified.");
 
     const info = await transporter.sendMail({
       from: `"CodeScreen" <${process.env.EMAIL_ID}>`,
@@ -71,15 +73,20 @@ export const sendEmail = async ({
       text,
     });
 
-    console.log("Email sent successfully!");
+    console.log("✅ Email sent successfully!");
     console.log("Message ID:", info.messageId);
     console.log("Accepted:", info.accepted);
     console.log("Rejected:", info.rejected);
     console.log("=================================");
-  } catch (error) {
+  } catch (error: any) {
     console.error("=================================");
-    console.error("Failed to send email.");
-    console.error(error);
+    console.error("❌ Failed to send email");
+    console.error("Name:", error?.name);
+    console.error("Message:", error?.message);
+    console.error("Code:", error?.code);
+    console.error("Command:", error?.command);
+    console.error("Response:", error?.response);
+    console.error("Stack:", error?.stack);
     console.error("=================================");
     throw error;
   }
